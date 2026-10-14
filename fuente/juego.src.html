@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tarjetas amarradas · Edición UNO · Dependencias y modelo ER</title>
+<style>
+:root{--azul:#002C71;--oro:#EAAA00;--vino:#910048;--teal:#002C38;--texto:#2D3B45;--tenue:#8a95a1;--cw:96px;--chh:142px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#e9edf3;color:var(--texto);font-family:Calibri,"Segoe UI",Arial,sans-serif;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+#app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:1100px;margin:0 auto;background:#fff;position:relative;overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--azul);color:#fff;border-bottom:4px solid var(--oro);flex:none;z-index:2}
+header .tit{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+header .tit b{font-family:Poppins,Calibri,sans-serif;font-size:18px}
+header .tit span{font-size:13.5px;color:#c9d6ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#est{margin-left:auto;display:flex;align-items:center;gap:5px;font-weight:700;font-size:17px;color:var(--oro);flex:none}
+#est svg{width:20px;height:20px}
+#bAyuda{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid #c9d6ec;background:none;color:#fff;font-weight:700;font-size:17px}
+.pant{display:none;flex:1;min-height:0;flex-direction:column}
+.pant.on{display:flex}
+
+/* portada */
+#portada{align-items:center;justify-content:center;padding:20px;gap:14px;text-align:center;background:linear-gradient(160deg,#fff 0%,#f2f5fa 100%);overflow:auto}
+#portada h1{font-family:Poppins,Calibri,sans-serif;color:#fff;background:var(--oro);display:inline-block;padding:8px 26px;margin:0;transform:rotate(-1.4deg);font-size:30px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+#portada .sub{font:800 20px Poppins,Calibri,sans-serif;color:var(--vino);letter-spacing:2px}
+#portada p{margin:0;font-size:18px;max-width:520px;line-height:1.4}
+.abanico{display:flex;justify-content:center;height:150px;align-items:flex-end}
+.abanico .naipe{margin:0 -16px}
+.abanico .naipe:nth-child(1){transform:rotate(-14deg) translateY(10px)}
+.abanico .naipe:nth-child(3){transform:rotate(14deg) translateY(10px)}
+.campos{display:flex;flex-direction:column;gap:10px;width:min(360px,90vw)}
+.campos input{font:inherit;font-size:18px;padding:11px 14px;border:2px solid #d8e2f2;border-radius:10px;outline:none}
+.campos input:focus{border-color:var(--azul)}
+.pri{background:var(--azul);color:#fff;border:none;border-radius:12px;font:700 18px Poppins,Calibri,sans-serif;padding:12px 24px;box-shadow:0 4px 0 var(--oro)}
+.pri:disabled{opacity:.45;box-shadow:none;cursor:default}
+.sec{background:#fff;color:var(--azul);border:2px solid #d8e2f2;border-radius:12px;font:700 16px Poppins,Calibri,sans-serif;padding:10px 16px}
+.nota{font-size:14px;color:var(--tenue)}
+
+/* la mesa de juego */
+#juego{background:radial-gradient(ellipse at 50% 42%,#0d4296 0%,#002C71 62%,#001b47 100%);color:#fff}
+#rival{display:flex;align-items:center;gap:10px;padding:8px 14px;flex:none}
+#rival .avatar{width:46px;height:46px;flex:none;background:#fff;border-radius:50%;padding:3px}
+#rival .avatar svg{width:100%;height:100%}
+#rival b{font-size:17px}
+#rival .dorsos{display:flex;margin-left:8px}
+#rival .dorsos i{width:26px;height:38px;border-radius:5px;margin-left:-12px;border:2px solid #fff;background:var(--vino);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+#rival .cuenta{font:700 15px Consolas,monospace;color:#c9d6ec;margin-left:4px}
+#rival .turno{margin-left:auto;font-size:14px;font-weight:700;color:var(--oro)}
+#centro{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:4px 10px}
+.pilas{display:flex;gap:26px;align-items:center}
+#mazo{position:relative;cursor:pointer;border:none;background:none;padding:0}
+#mazo .cnt{position:absolute;top:-20px;left:-20px;right:-20px;text-align:center;font:700 12.5px Consolas,monospace;color:#c9d6ec}
+#descarte .naipe{transform:scale(1.12)}
+#regla{font-size:18px;text-align:center;line-height:1.3;max-width:560px}
+#regla b{color:var(--oro)}
+.mesas{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.mesas span{font-size:12.5px;font-weight:700;letter-spacing:.8px;padding:3px 9px;border-radius:20px;border:1.5px solid rgba(255,255,255,.55)}
+#bitacora{font-size:14.5px;color:#dfe7f5;text-align:center;line-height:1.35;min-height:40px}
+#bitacora div:first-child{color:#fff;font-weight:700}
+#mano{flex:none;display:flex;gap:6px;overflow-x:auto;overflow-y:visible;padding:20px 12px 8px;background:rgba(0,0,0,.18);scrollbar-width:thin}
+#mano .naipe{transition:transform .15s}
+#mano .naipe.sel{transform:translateY(-16px);box-shadow:0 0 0 4px var(--oro),0 8px 18px rgba(0,0,0,.45)}
+#mano .naipe.nueva{animation:nueva .5s}
+#acciones{flex:none;display:flex;gap:10px;padding:8px 10px 12px;justify-content:center;align-items:center;background:rgba(0,0,0,.18)}
+#bUno{background:var(--vino);color:#fff;border:3px solid #fff;border-radius:50%;width:72px;height:72px;font:900 17px Poppins,Calibri,sans-serif;box-shadow:0 4px 0 #5a002c}
+#bUno:disabled{opacity:.35;box-shadow:none;cursor:default}
+#bUno.dicho{background:var(--oro);color:var(--azul)}
+#bUno.pulso{animation:pulso 1s infinite}
+#bRobar{min-width:150px}
+#aviso{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;z-index:15;
+  font:900 44px Poppins,Calibri,sans-serif;color:var(--oro);text-shadow:0 3px 0 var(--vino),0 6px 18px rgba(0,0,0,.5);transition:all .25s;white-space:nowrap}
+#aviso.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* el naipe */
+.naipe{position:relative;flex:none;width:var(--cw);height:var(--chh);border-radius:12px;border:4px solid #fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,.35);cursor:pointer;user-select:none;-webkit-user-select:none;overflow:hidden}
+.naipe.azul{background:var(--azul)}.naipe.oro{background:var(--oro)}.naipe.vino{background:var(--vino)}.naipe.teal{background:var(--teal)}
+.naipe.clave{background:conic-gradient(from 45deg,var(--azul) 0 25%,var(--oro) 0 50%,var(--vino) 0 75%,var(--teal) 0)}
+.naipe.dorso{background:var(--vino);cursor:pointer}
+.naipe .ovalo{position:absolute;left:8%;right:8%;top:20%;bottom:20%;background:#fff;border-radius:50%;transform:rotate(-24deg)}
+.naipe .nom{position:relative;font:800 16px Calibri,"Segoe UI",sans-serif;text-align:center;line-height:1.05;padding:0 4px;word-break:break-word}
+.naipe.azul .nom{color:var(--azul)}.naipe.oro .nom{color:#8a6400}.naipe.vino .nom{color:var(--vino)}.naipe.teal .nom{color:var(--teal)}
+.naipe.clave .nom{color:var(--azul)}
+.naipe .nom u{text-underline-offset:3px}
+.naipe .esq{position:absolute;top:4px;left:6px;font:700 11px Consolas,monospace;color:#fff;max-width:80%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.naipe.oro .esq{color:#2b2100}
+.naipe .esq.b{top:auto;left:auto;bottom:4px;right:6px;transform:rotate(180deg)}
+.naipe .acc{display:block;margin-top:3px;font:900 15px Poppins,Calibri,sans-serif;color:var(--vino);letter-spacing:.5px}
+.naipe.dorso .ovalo{background:var(--oro)}
+.naipe.dorso .nom{color:var(--vino);font-size:15px;letter-spacing:1px}
+.naipe.entra{animation:entra .35s}
+.naipe.mini{--cw:30px;--chh:44px;border-width:2px;border-radius:5px}
+@keyframes entra{from{transform:scale(1.5) rotate(-12deg);opacity:0}}
+@keyframes nueva{from{transform:translateY(-40px);opacity:0}}
+@keyframes pulso{50%{box-shadow:0 0 0 10px rgba(234,170,0,.45)}}
+
+/* hoja de mensajes */
+#velo{position:absolute;inset:0;background:rgba(4,12,30,.5);z-index:20;display:none}
+#velo.on{display:block}
+#hoja{position:absolute;left:0;right:0;bottom:0;max-height:82%;overflow:auto;background:#fff;color:var(--texto);border-radius:18px 18px 0 0;z-index:21;
+  padding:16px 16px 18px;transform:translateY(105%);transition:transform .3s;box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+#hoja.on{transform:none}
+#hoja h2{margin:0 0 10px;font-family:Poppins,Calibri,sans-serif;font-size:21px;color:var(--azul)}
+#hoja h2.mal{color:var(--vino)}
+#hoja .item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:#fdf2f7;margin-bottom:8px}
+#hoja .item .stk{flex:none;width:72px;height:72px}
+#hoja .item .stk svg{width:100%;height:100%}
+#hoja .item span{font-size:17px;line-height:1.4}
+#hoja .estrellas{display:flex;gap:6px;justify-content:center;margin:6px 0 10px}
+#hoja .estrellas svg{width:42px;height:42px}
+#hoja p{font-size:17px;line-height:1.4;margin:0 0 10px}
+#hoja .bot{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+#hoja .claves{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 12px}
+.pasos div{background:#f2f5fa;border-radius:12px;padding:10px 8px;text-align:center;font-size:15.5px;line-height:1.35}
+.pasos div b{display:block;font-size:24px;color:var(--oro);font-family:Poppins,Calibri,sans-serif}
+.pasos .demo{display:flex;justify-content:center;gap:5px;margin-bottom:6px;--cw:60px;--chh:88px}
+.pasos .demo .naipe{border-width:2px;border-radius:6px}
+.pasos .demo .nom{font-size:9.5px;padding:0}
+.pasos .demo .esq,.pasos .demo .acc{font-size:8px}
+
+/* final */
+#final{align-items:center;overflow:auto;padding:18px;gap:14px}
+.constancia{width:min(640px,94vw);border:3px solid var(--azul);border-radius:16px;padding:20px 22px;text-align:center;display:flex;flex-direction:column;gap:10px;position:relative}
+.constancia::before{content:"";position:absolute;inset:6px;border:1.5px solid var(--oro);border-radius:11px;pointer-events:none}
+.constancia h2{margin:0;font-family:Poppins,Calibri,sans-serif;color:var(--azul)}
+.constancia .quien{font-size:26px;font-weight:700;color:var(--vino)}
+.constancia table{border-collapse:collapse;width:100%;font-size:15px}
+.constancia td{padding:5px 8px;border-bottom:1px solid #e4e7eb;text-align:left}
+.constancia td:last-child{text-align:right;white-space:nowrap;color:var(--oro);font-size:17px;letter-spacing:2px}
+#toast{position:absolute;left:50%;top:64px;transform:translate(-50%,-20px);opacity:0;background:var(--teal);color:#fff;padding:9px 16px;border-radius:10px;
+  font-size:15px;z-index:30;transition:all .25s;pointer-events:none;max-width:90%;text-align:center;border:1.5px solid rgba(255,255,255,.4)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:560px){
+  :root{--cw:78px;--chh:116px}
+  .naipe .nom{font-size:13.5px}
+  .naipe .esq{font-size:10px}
+  header .tit b{font-size:16px}
+  #regla{font-size:16px}
+  .pilas{gap:18px}
+  .pasos{grid-template-columns:1fr}
+  #bUno{width:64px;height:64px;font-size:15px}
+}
+@media (max-height:700px){ #bitacora{display:none} }
+@media print{
+  body{background:#fff;overflow:visible}
+  header,#final .bot,#toast,#velo,#hoja,#aviso{display:none!important}
+  #app{height:auto;max-width:none}
+  .pant{display:none!important}
+  #final{display:flex!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="tit"><b>Tarjetas amarradas · UNO</b><span id="rtit">Dependencias y modelo ER</span></div>
+    <div id="est"></div>
+    <button id="bAyuda" title="Cómo se juega" hidden>?</button>
+  </header>
+
+  <section id="portada" class="pant on">
+    <h1>Tarjetas amarradas</h1>
+    <div class="sub">EDICIÓN UNO</div>
+    <div class="abanico" id="abanico"></div>
+    <p>Juegue contra la Máquina. Sobre la carta de la mesa vale tirar <b>el mismo dato</b> o una carta <b>amarrada</b>: la que la manda o una que ella manda. Gana quien se quede sin cartas.</p>
+    <div class="campos">
+      <input id="iNom" placeholder="Nombre" autocomplete="given-name" maxlength="40">
+      <input id="iApe" placeholder="Apellido" autocomplete="family-name" maxlength="40">
+      <button id="bEmpezar" class="pri" disabled>Empezar</button>
+      <button id="bSeguir" class="sec" hidden></button>
+    </div>
+    <span class="nota">Dependencias y modelo ER · juego individual · 3 partidas</span>
+  </section>
+
+  <section id="juego" class="pant">
+    <div id="rival"><div class="avatar" id="avatar"></div><b>La Máquina</b><div class="dorsos" id="dorsos"></div><span class="cuenta" id="cuenta"></span><span class="turno" id="quienJuega"></span></div>
+    <div id="centro">
+      <div class="pilas">
+        <button id="mazo" title="Robar una carta"><div class="naipe dorso"><div class="ovalo"></div><span class="nom">DATOS</span></div><span class="cnt" id="cntMazo"></span></button>
+        <div id="descarte"></div>
+      </div>
+      <div id="regla"></div>
+      <div class="mesas" id="mesas"></div>
+      <div id="bitacora"></div>
+    </div>
+    <div id="mano"></div>
+    <div id="acciones"><button id="bRobar" class="sec">Robar una carta</button><button id="bUno" disabled>¡UNO!</button></div>
+    <div id="aviso"></div>
+  </section>
+
+  <section id="final" class="pant">
+    <div class="constancia" id="constancia"></div>
+    <div class="bot" style="display:flex;gap:10px"><button class="pri" id="bImprimir">Imprimir constancia</button><button class="sec" id="bOtra">Jugar otra vez</button></div>
+  </section>
+
+  <div id="velo"></div>
+  <div id="hoja"></div>
+  <div id="toast"></div>
+</div>
+
+<script>
+"use strict";
+const STICKERS = __STICKERS__;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+// ------------------------------------------------------------------ azar con semilla (?semilla=n deja la partida repetible para las pruebas)
+let semilla = +(new URLSearchParams(location.search).get("semilla")) || (Date.now() % 2147483647);
+const azar = () => { semilla = (semilla + 0x6D2B79F5) | 0; let t = Math.imul(semilla ^ (semilla >>> 15), 1 | semilla);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const baraja = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(azar() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// ------------------------------------------------------------------ las tres partidas: datos, su mesa (color) y las dependencias
+const PEDIDO_VAL = {"Cédula": ["1104", "1717", "0912"], "Nombre": ["Ana Ruiz", "Luis Paz", "Sara León"], "Dirección": ["Av. Loja 12", "Calle Sucre 8", "Av. Bolívar 3"],
+  "ID_Pedido": ["P-01", "P-02", "P-03", "P-04"], "Fecha": ["12/10", "13/10", "14/10"], "Producto": ["Pizza", "Jugo", "Hamburguesa"], "Precio": ["$9", "$2", "$6"], "Cantidad": ["1", "2", "3"]};
+const PARTIDAS = [
+  {tit: "El cliente y su pedido", copias: 3, duda: .3, val: PEDIDO_VAL,
+    mesa: {"Cédula": "CLIENTE", "Nombre": "CLIENTE", "Dirección": "CLIENTE", "ID_Pedido": "PEDIDO", "Fecha": "PEDIDO"},
+    color: {CLIENTE: "azul", PEDIDO: "oro"},
+    F: [[["Cédula"], ["Nombre", "Dirección"]], [["ID_Pedido"], ["Fecha", "Cédula"]]]},
+  {tit: "El pedido completo", copias: 2, duda: .22, val: PEDIDO_VAL,
+    mesa: {"Cédula": "CLIENTE", "Nombre": "CLIENTE", "Dirección": "CLIENTE", "ID_Pedido": "PEDIDO", "Fecha": "PEDIDO", "Producto": "PRODUCTO", "Precio": "PRODUCTO", "Cantidad": "DETALLE"},
+    color: {CLIENTE: "azul", PEDIDO: "oro", PRODUCTO: "vino", DETALLE: "teal"},
+    F: [[["Cédula"], ["Nombre", "Dirección"]], [["ID_Pedido"], ["Fecha", "Cédula"]], [["Producto"], ["Precio"]], [["ID_Pedido", "Producto"], ["Cantidad"]]]},
+  {tit: "Reto: la veterinaria", copias: 2, duda: .15,
+    val: {"MascotaID": ["M1", "M2", "M3"], "Mascota": ["Toby", "Misha", "Rocky"], "Cedula": ["1101", "1102"], "Cliente": ["Carla Ruiz", "Diego León"],
+      "Telefono": ["0991112233", "0987654321"], "VacunaID": ["V1", "V2", "V3"], "Vacuna": ["Rabia", "Moquillo", "Parvovirus"], "Fecha": ["03/02", "10/02", "05/02", "12/02"]},
+    mesa: {"MascotaID": "MASCOTA", "Mascota": "MASCOTA", "Cedula": "CLIENTE", "Cliente": "CLIENTE", "Telefono": "CLIENTE", "VacunaID": "VACUNA", "Vacuna": "VACUNA", "Fecha": "APLICACION"},
+    color: {CLIENTE: "azul", MASCOTA: "oro", VACUNA: "vino", APLICACION: "teal"},
+    F: [[["MascotaID"], ["Mascota", "Cedula"]], [["Cedula"], ["Cliente", "Telefono"]], [["VacunaID"], ["Vacuna"]], [["MascotaID", "VacunaID"], ["Fecha"]]]}
+];
+
+// ------------------------------------------------------------------ lógica de los hilos (la prueba la ejecuta aparte)
+const hilos = Pt => Pt.F.flatMap(([de, a]) => a.map(x => ({de, a: x})));
+const claves = Pt => [...new Set(Pt.F.flatMap(([de]) => de))];
+const amarradas = (Pt, x, y) => x !== y && hilos(Pt).some(h => (h.a === y && h.de.includes(x)) || (h.a === x && h.de.includes(y)));
+const vecinos = (Pt, x) => Object.keys(Pt.mesa).filter(y => amarradas(Pt, x, y));
+const vale = (Pt, a, top) => a === top || amarradas(Pt, a, top);      // mismo dato o un hilo directo
+function sentido(Pt, x, y) {        // el hilo entre x e y, escrito desde quien manda
+  const h = hilos(Pt).find(h => (h.a === y && h.de.includes(x)) || (h.a === x && h.de.includes(y)));
+  return h ? `${h.de.join(" + ")} → ${h.a}` : "";
+}
+function cadena(Pt, x, y) {         // camino de dos o más hilos de x a y, siguiendo quién manda
+  const sig = n => hilos(Pt).filter(h => h.de.includes(n)).map(h => h.a);
+  const cola = [[x]];
+  while (cola.length) {
+    const c = cola.shift(), u = c[c.length - 1];
+    for (const v of sig(u)) if (!c.includes(v)) { const n = c.concat(v); if (v === y) { if (n.length > 2) return n; } else cola.push(n); }
+  }
+  return null;
+}
+function porQue(Pt, jugada, top) {
+  const jefes = x => hilos(Pt).filter(h => h.a === x).map(h => h.de.join(" + "));
+  const c = cadena(Pt, top, jugada) || cadena(Pt, jugada, top), comun = jefes(jugada).find(j => jefes(top).includes(j));
+  const t = c ? `${c[c.length - 1]} depende de ${c[0]} solo por la cadena ${c.join(" → ")}. Aquí valen solo los hilos directos.`
+    : comun ? `${jugada} y ${top} ${Pt.mesa[jugada] === Pt.mesa[top] ? "son de la misma mesa y " : "las dos "}obedecen a ${comun}, pero entre ellas no hay hilo.`
+    : `Entre ${top} y ${jugada} no hay hilo: ni ${top} decide ${jugada}, ni ${jugada} decide ${top}.`;
+  return `${t} Sobre ${top} se podía tirar otra carta ${top}, ${vecinos(Pt, top).join(", ")} o una CLAVE.`;
+}
+
+// ------------------------------------------------------------------ estado y guardado
+const CLAVE_LS = "tarjetas-amarradas";
+let P = JSON.parse(localStorage.getItem(CLAVE_LS) || "null") || {nombre: "", apellido: "", partida: 0, est: [], err: []};
+const guarda = () => localStorage.setItem(CLAVE_LS, JSON.stringify(P));
+let G = null;
+const ESTRELLA = on => `<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6L2.5 9.3l6.6-.8z" fill="${on ? "#EAAA00" : "none"}" stroke="${on ? "#EAAA00" : "#c9d3e0"}" stroke-width="1.6"/></svg>`;
+const estrellas = () => P.est.reduce((a, b) => a + (b || 0), 0);
+function cabecera() {
+  $("#est").innerHTML = ESTRELLA(true) + estrellas();
+  if (G) $("#rtit").textContent = `Partida ${P.partida + 1} de ${PARTIDAS.length} · ${PARTIDAS[P.partida].tit}`;
+}
+function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2300); }
+function aviso(t) { const e = $("#aviso"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 1100); }
+function pantalla(id) { document.querySelectorAll("#app > .pant").forEach(p => p.classList.toggle("on", p.id === id)); }
+function hoja(html) { $("#hoja").innerHTML = html; $("#hoja").classList.add("on"); $("#velo").classList.add("on"); }
+function cierraHoja() { $("#hoja").classList.remove("on"); $("#velo").classList.remove("on"); }
+const sticker = () => STICKERS[Math.floor(Math.random() * STICKERS.length)][0];
+function hojaError(titulo, texto, luego) {
+  hoja(`<h2 class="mal">${titulo}</h2><div class="item"><div class="stk">${sticker()}</div><span>${esc(texto)}</span></div>
+    <div class="bot"><button class="pri" id="bEntendido">Entendido</button></div>`);
+  $("#bEntendido").onclick = () => { cierraHoja(); luego(); };
+}
+
+// ------------------------------------------------------------------ cartas
+function naipe(c, Pt, extra = "") {
+  if (c.tipo === "clave") return `<div class="naipe clave ${extra}" data-id="${c.id}"><div class="ovalo"></div><span class="nom">CLAVE${c.elegida ? `<br><u>${esc(c.elegida)}</u>` : ""}</span><span class="esq">comodín</span></div>`;
+  const nom = claves(Pt).includes(c.a) ? `<u>${esc(c.a)}</u>` : esc(c.a);
+  const acc = c.tipo === "mas2" ? `<span class="acc">+2</span>` : c.tipo === "salta" ? `<span class="acc">SALTA</span>` : "";
+  return `<div class="naipe ${Pt.color[Pt.mesa[c.a]]} ${extra}" data-id="${c.id}"><div class="ovalo"></div><span class="nom">${nom}${acc}</span>` +
+    `<span class="esq">${esc(c.v)}</span><span class="esq b">${esc(c.v)}</span></div>`;
+}
+function armaMazo(Pt) {
+  const cs = []; let id = 0;
+  for (const a of Object.keys(Pt.mesa)) for (let k = 0; k < Pt.copias; k++) cs.push({id: id++, a, v: Pt.val[a][k % Pt.val[a].length], tipo: "dato"});
+  baraja(cs);
+  const n = Math.round(cs.length * .15), libres = cs.filter(c => !claves(Pt).includes(c.a));
+  libres.slice(0, n).forEach(c => c.tipo = "mas2");
+  libres.slice(n, 2 * n).forEach(c => c.tipo = "salta");
+  for (let k = 0; k < 4; k++) cs.push({id: id++, tipo: "clave"});
+  return baraja(cs);
+}
+
+// ------------------------------------------------------------------ la partida
+function nuevaPartida() {
+  const Pt = PARTIDAS[P.partida];
+  G = {Pt, mazo: armaMazo(Pt), pila: [], yo: [], bot: [], top: null, turno: "yo", robo: false, uno: false, err: 0, log: [], fin: false, ocupado: false, sel: null, nuevo: null};
+  for (let k = 0; k < 5; k++) { G.yo.push(G.mazo.pop()); G.bot.push(G.mazo.pop()); }
+  const i = G.mazo.findIndex(c => c.tipo === "dato" && claves(Pt).includes(c.a));
+  const c = G.mazo.splice(i, 1)[0];
+  G.pila.push(c); G.top = {c, a: c.a};
+  pantalla("juego"); $("#bAyuda").hidden = false; cabecera(); render(true);
+  if (!P.vioAyuda) { P.vioAyuda = true; guarda(); ayuda(); }
+}
+function render(entra) {
+  const Pt = G.Pt;
+  $("#avatar").innerHTML = STICKERS[4] ? STICKERS[4][0] : "";
+  $("#dorsos").innerHTML = "<i></i>".repeat(Math.min(G.bot.length, 12));
+  $("#cuenta").textContent = G.bot.length + (G.bot.length === 1 ? " carta" : " cartas");
+  $("#quienJuega").textContent = G.fin ? "" : G.turno === "bot" ? "pensando…" : "";
+  $("#cntMazo").textContent = G.mazo.length + " en el mazo";
+  const top = Object.assign({}, G.top.c, G.top.c.tipo === "clave" ? {elegida: G.top.a} : {});
+  $("#descarte").innerHTML = naipe(top, Pt, entra ? "entra" : "");
+  $("#regla").innerHTML = G.fin ? "" : G.turno === "yo"
+    ? (G.sel !== null ? `Toque otra vez la carta elegida para tirarla sobre <b>${esc(G.top.a)}</b>.`
+      : `Su turno: tire otra carta <b>${esc(G.top.a)}</b> o una amarrada a ella${G.robo ? ", o pase" : ""}.`) : `Turno de la Máquina…`;
+  $("#mesas").innerHTML = Object.entries(Pt.color).map(([m, c]) => `<span style="background:var(--${c === "oro" ? "oro" : c});color:${c === "oro" ? "#2b2100" : "#fff"}">${m}</span>`).join("");
+  $("#bitacora").innerHTML = G.log.map(l => `<div>${esc(l)}</div>`).join("");
+  $("#mano").innerHTML = G.yo.map(c => naipe(c, Pt, (c.id === G.sel ? "sel " : "") + (c.id === G.nuevo ? "nueva" : ""))).join("");
+  const mio = G.turno === "yo" && !G.fin && !G.ocupado;
+  $("#bRobar").textContent = G.robo ? "Pasar el turno" : "Robar una carta";
+  $("#bRobar").disabled = !mio;
+  const b = $("#bUno");
+  b.disabled = !(mio && G.yo.length === 2 && !G.uno);
+  b.classList.toggle("dicho", G.uno);
+  b.classList.toggle("pulso", mio && G.yo.length === 2 && !G.uno);
+}
+function registra(quien, texto) { G.log.unshift(`${quien}: ${texto}`); G.log = G.log.slice(0, 2); }
+function robaUna(quien) {
+  if (!G.mazo.length && G.pila.length > 1) { const top = G.pila.pop(); G.mazo = baraja(G.pila); G.pila = [top]; }
+  if (!G.mazo.length) return null;
+  const c = G.mazo.pop(); G[quien].push(c); return c;
+}
+const valida = c => c.tipo === "clave" || vale(G.Pt, c.a, G.top.a);
+function renuevaMesa() {          // nadie puede jugar ni robar: la mesa pone una clave nueva
+  const ks = claves(G.Pt), k = ks[Math.floor(azar() * ks.length)];
+  G.top = {c: {id: -9, tipo: "clave"}, a: k}; registra("Mesa", `se acabó el mazo: pone la clave ${k}`); render(true);
+}
+function turno(q) {
+  G.turno = q; G.robo = false; G.sel = null;
+  if (q === "yo") G.uno = false;
+  render();
+  if (q === "bot") setTimeout(juegaBot, 950);
+}
+
+// --- jugadas del jugador
+$("#mano").addEventListener("click", e => {
+  const n = e.target.closest(".naipe"); if (!n || !G || G.turno !== "yo" || G.ocupado || G.fin) return;
+  const id = +n.dataset.id;
+  if (G.sel !== id) { G.sel = id; G.nuevo = null; render(); return; }
+  G.sel = null; tirar(id);
+});
+function tirar(id) {
+  const i = G.yo.findIndex(c => c.id === id), c = G.yo[i], Pt = G.Pt;
+  if (!valida(c)) {
+    G.err++; G.ocupado = true; render();
+    hojaError("Hilo falso", porQue(Pt, c.a, G.top.a) + " Castigo: roba 1 carta.", () => {
+      const r = robaUna("yo"); G.nuevo = r && r.id; G.ocupado = false; registra("Usted", `${c.a} sobre ${G.top.a}: hilo falso`); turno("bot");
+    });
+    return;
+  }
+  G.yo.splice(i, 1); G.pila.push(c);
+  if (c.tipo === "clave") return eligeClave(k => { G.top = {c, a: k}; registra("Usted", `CLAVE: pone ${k} en la mesa`); despues(c); });
+  registra("Usted", (c.a === G.top.a ? `${c.a} sobre ${c.a}: mismo dato` : sentido(Pt, c.a, G.top.a)) + " ✓");
+  G.top = {c, a: c.a};
+  despues(c);
+}
+function despues(c) {
+  render(true);
+  if (G.yo.length === 1 && !G.uno) {
+    G.err++; robaUna("yo"); robaUna("yo"); G.ocupado = true; render();
+    return hojaError("Olvidó decir ¡UNO!", "Con dos cartas en la mano hay que pulsar ¡UNO! antes de tirar la penúltima. Castigo: roba 2 cartas.",
+      () => { G.ocupado = false; efecto(c, "yo"); });
+  }
+  if (G.yo.length === 1) aviso("¡UNO!");
+  if (!G.yo.length) return termina("yo");
+  efecto(c, "yo");
+}
+function efecto(c, quien) {
+  const otro = quien === "yo" ? "bot" : "yo", nom = quien === "yo" ? "La Máquina" : "Usted";
+  if (c.tipo === "mas2") { robaUna(otro); robaUna(otro); aviso("+2"); toast(`${nom} roba 2 cartas y pierde el turno`); return turno(quien); }
+  if (c.tipo === "salta") { aviso("SALTA"); toast(`${nom} pierde el turno`); return turno(quien); }
+  turno(otro);
+}
+function eligeClave(luego) {
+  G.ocupado = true; render();
+  hoja(`<h2>¿Qué clave pone en la mesa?</h2><p>La siguiente carta tendrá que estar amarrada a la clave que elija.</p>
+    <div class="claves">${claves(G.Pt).map(k => `<button class="pri" data-k="${esc(k)}">${esc(k)}</button>`).join("")}</div>`);
+  $("#hoja").querySelectorAll("[data-k]").forEach(b => b.onclick = () => { cierraHoja(); G.ocupado = false; luego(b.dataset.k); });
+}
+$("#bRobar").onclick = () => {
+  if (!G || G.turno !== "yo" || G.ocupado || G.fin) return;
+  if (G.robo) { registra("Usted", "pasa"); return turno("bot"); }
+  const r = robaUna("yo"); G.robo = true; G.sel = null; G.nuevo = r && r.id;
+  render();
+  if (!r) { if (!G.yo.some(valida)) { renuevaMesa(); G.robo = false; render(); } toast("No quedan cartas en el mazo"); }
+  else toast(valida(r) ? `Robó ${r.tipo === "clave" ? "una CLAVE" : r.a}: ¡se puede tirar!` : `Robó ${r.a}. Si no tiene jugada, pase.`);
+};
+$("#mazo").onclick = () => $("#bRobar").click();
+$("#bUno").onclick = () => { if (G && G.turno === "yo" && G.yo.length === 2 && !G.uno) { G.uno = true; aviso("¡UNO!"); render(); } };
+
+// --- la Máquina: conoce los hilos, pero a veces duda y roba
+function juegaBot() {
+  if (!G || G.fin || G.turno !== "bot") return;
+  const Pt = G.Pt;
+  let ops = G.bot.filter(valida);
+  if (ops.length && azar() < Pt.duda) ops = [];
+  if (!ops.length) {
+    const r = robaUna("bot");
+    if (!r && !G.bot.some(valida)) renuevaMesa(); else registra("Máquina", "roba una carta");
+    render();
+    if (r && valida(r) && azar() < .6) ops = [r];
+    else return setTimeout(() => { if (!G.fin) turno("yo"); }, 650);
+  }
+  const peso = c => c.tipo === "clave" ? 0 : c.tipo !== "dato" && G.yo.length <= 3 ? 3 : c.tipo === "dato" ? 2 : 1;
+  const c = ops.sort((a, b) => peso(b) - peso(a))[0];
+  G.bot.splice(G.bot.indexOf(c), 1); G.pila.push(c);
+  if (c.tipo === "clave") {
+    const k = claves(Pt).map(k => [k, G.bot.filter(x => x.tipo !== "clave" && amarradas(Pt, x.a, k)).length]).sort((a, b) => b[1] - a[1])[0][0];
+    G.top = {c, a: k}; registra("Máquina", `CLAVE: pone ${k} en la mesa`);
+  } else { registra("Máquina", c.a === G.top.a ? `${c.a} sobre ${c.a}: mismo dato` : sentido(Pt, c.a, G.top.a)); G.top = {c, a: c.a}; }
+  render(true);
+  if (G.bot.length === 1) aviso("¡UNO!");
+  if (!G.bot.length) return termina("bot");
+  setTimeout(() => { if (!G.fin) efecto(c, "bot"); }, 500);
+}
+
+// --- fin de partida
+function termina(q) {
+  G.fin = true; render();
+  if (q === "yo") {
+    const e = G.err <= 0 ? 3 : G.err <= 2 ? 2 : 1, ult = P.partida === PARTIDAS.length - 1;
+    P.est[P.partida] = Math.max(P.est[P.partida] || 0, e); P.err[P.partida] = G.err; guarda(); cabecera();
+    hoja(`<h2>¡Ganó la partida!</h2><div class="estrellas">${[1, 2, 3].map(k => ESTRELLA(k <= e)).join("")}</div>
+      <p>${G.err ? `Tuvo ${G.err} ${G.err === 1 ? "error" : "errores"} (hilos falsos u olvidos de ¡UNO!).` : "Sin un solo hilo falso."} Le quedaron a la Máquina ${G.bot.length} cartas.</p>
+      <div class="bot"><button class="pri" id="bSig">${ult ? "Ver mi constancia" : "Siguiente partida"}</button></div>`);
+    $("#bSig").onclick = () => { cierraHoja(); P.partida++; guarda(); P.partida >= PARTIDAS.length ? fin() : nuevaPartida(); };
+  } else {
+    hoja(`<h2 class="mal">La Máquina ganó</h2><div class="item"><div class="stk">${sticker()}</div><span>A usted le quedaron ${G.yo.length} cartas. Revancha: la misma partida con cartas nuevas.</span></div>
+      <div class="bot"><button class="pri" id="bRevancha">Revancha</button></div>`);
+    $("#bRevancha").onclick = () => { cierraHoja(); nuevaPartida(); };
+  }
+}
+function ayuda() {
+  const Pt = G ? G.Pt : PARTIDAS[0], d = (a, v, t) => naipe({id: -1, a, v, tipo: t || "dato"}, PARTIDAS[1]);
+  hoja(`<h2>Cómo se juega</h2><div class="pasos">
+    <div><div class="demo">${d("Cédula", "1104")}${d("Nombre", "Ana Ruiz")}</div><b>1</b>Toque una carta y tóquela otra vez para tirarla. Vale el mismo dato o una carta <b style="display:inline;font-size:inherit;color:var(--azul)">amarrada</b> a la de la mesa: la que la manda o una que ella manda.</div>
+    <div><div class="demo">${d("Fecha", "12/10", "mas2")}${d("Precio", "$9", "salta")}${naipe({id: -1, tipo: "clave"}, Pt)}</div><b>2</b>+2: la Máquina roba 2 y pierde el turno. SALTA: pierde el turno. CLAVE: va sobre cualquier carta y usted elige la clave.</div>
+    <div><div class="demo">${d("ID_Pedido", "P-01")}</div><b>3</b>Sin jugada, robe una carta. Con 2 cartas, pulse ¡UNO! antes de tirar la penúltima. Gana quien se quede sin cartas.</div>
+  </div><p class="nota">El color de la carta es su mesa (tabla). Las claves van subrayadas.</p><div class="bot"><button class="pri" id="bListo">¡A jugar!</button></div>`);
+  $("#bListo").onclick = cierraHoja;
+}
+function fin() {
+  $("#toast").classList.remove("on");
+  G = null; pantalla("final"); $("#bAyuda").hidden = true; $("#rtit").textContent = "Constancia";
+  const hoy = new Date().toLocaleDateString("es-EC", {day: "numeric", month: "long", year: "numeric"});
+  $("#constancia").innerHTML = `<h2>Constancia · Tarjetas amarradas · UNO</h2>
+    <div class="quien">${esc(P.nombre)} ${esc(P.apellido)}</div><span>ganó las ${PARTIDAS.length} partidas con <b>${estrellas()} de ${PARTIDAS.length * 3}</b> estrellas</span>
+    <table>${PARTIDAS.map((p, i) => `<tr><td>${i + 1}. ${esc(p.tit)} · ${P.err[i] || 0} errores</td><td>${"★".repeat(P.est[i] || 0)}${"☆".repeat(3 - (P.est[i] || 0))}</td></tr>`).join("")}</table>
+    <span class="nota">${hoy}</span>`;
+  cabecera();
+}
+$("#bImprimir").onclick = () => window.print();
+$("#bOtra").onclick = () => { P = {nombre: P.nombre, apellido: P.apellido, partida: 0, est: [], err: [], vioAyuda: true}; guarda(); nuevaPartida(); };
+$("#bAyuda").onclick = () => G && !G.ocupado && ayuda();
+$("#velo").onclick = () => { if ($("#bListo")) cierraHoja(); };
+const valida0 = () => { $("#bEmpezar").disabled = !($("#iNom").value.trim().length > 1 && $("#iApe").value.trim().length > 1); };
+$("#iNom").oninput = $("#iApe").oninput = valida0;
+$("#bEmpezar").onclick = () => { P = {nombre: $("#iNom").value.trim(), apellido: $("#iApe").value.trim(), partida: 0, est: [], err: []}; guarda(); nuevaPartida(); };
+$("#abanico").innerHTML = naipe({id: 0, a: "Cédula", v: "1104", tipo: "dato"}, PARTIDAS[1]) + naipe({id: 1, a: "ID_Pedido", v: "P-01", tipo: "mas2"}, PARTIDAS[1]) + naipe({id: 2, tipo: "clave"}, PARTIDAS[1]);
+if (P.nombre) {
+  $("#iNom").value = P.nombre; $("#iApe").value = P.apellido; valida0();
+  const b = $("#bSeguir"); b.hidden = false;
+  b.textContent = P.partida >= PARTIDAS.length ? "Ver mi constancia" : `Continuar en la partida ${P.partida + 1}`;
+  b.onclick = () => P.partida >= PARTIDAS.length ? fin() : nuevaPartida();
+  $("#bEmpezar").textContent = "Empezar de nuevo";
+}
+cabecera();
+window.__UNO = {PARTIDAS, amarradas, vale, porQue, sentido, cadena, claves, vecinos, estado: () => ({P, G})};
+</script>
+</body>
+</html>
