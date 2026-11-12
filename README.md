@@ -10,7 +10,7 @@ Cada carta es un dato de una tabla (Cédula, Nombre, ID_Pedido…). Sobre la car
 - **SALTA:** la Máquina pierde el turno.
 - **CLAVE:** va sobre cualquier carta y el jugador elige qué clave queda en la mesa.
 - Sin jugada posible, se roba una carta.
-- Con 2 cartas en la mano hay que pulsar **¡UNO!** antes de tirar la penúltima.
+- Con 2 cartas en la mano hay que pulsar `UNO` antes de tirar la penúltima.
 - Gana quien se quede sin cartas.
 
 Un hilo falso no pasa: el juego explica por qué esas dos cartas no están amarradas.
@@ -23,7 +23,7 @@ Un hilo falso no pasa: el juego explica por qué esas dos cartas no están amarr
 | 2 | El pedido completo | Cliente, Pedido, Producto, Detalle |
 | 3 | Reto: la veterinaria | Cliente, Mascota, Vacuna, Aplicación |
 
-Cada partida ganada da de 1 a 3 estrellas según los errores (hilos falsos u olvidos de ¡UNO!). Si gana la Máquina, hay revancha con cartas nuevas. Al ganar las tres partidas se genera una constancia imprimible. Solo se pide nombre y apellido; el avance se guarda en el mismo navegador.
+Cada partida ganada da de 1 a 3 estrellas según los errores (hilos falsos u olvidos de avisar `UNO`). Si gana la Máquina, hay revancha con cartas nuevas. Al ganar las tres partidas se genera una constancia imprimible. Solo se pide nombre y apellido; el avance se guarda en el mismo navegador.
 
 ## Estructura
 
